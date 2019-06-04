@@ -22,7 +22,7 @@ using Tizen.NUI.XamlBinding;
 using Tizen.NUI.Xaml.Forms.BaseComponents;
 using static Tizen.NUI.UIComponents.ProgressBar;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
     /// <summary>
     /// The ProgressBar is a control to give the user an indication of the progress of an operation.

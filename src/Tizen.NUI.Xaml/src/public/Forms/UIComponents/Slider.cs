@@ -22,7 +22,7 @@ using Tizen.NUI.XamlBinding;
 using Tizen.NUI;
 using static Tizen.NUI.UIComponents.Slider;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
     /// <summary>
     /// The slider is a control to enable sliding an indicator between two values.

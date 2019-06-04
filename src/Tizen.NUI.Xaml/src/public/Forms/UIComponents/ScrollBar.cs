@@ -22,7 +22,7 @@ using Tizen.NUI.XamlBinding;
 using Tizen.NUI.Xaml.Forms.BaseComponents;
 using static Tizen.NUI.UIComponents.ScrollBar;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
     /// <summary>
     /// The ScrollBar is a UI component that can be linked to the scrollable objects

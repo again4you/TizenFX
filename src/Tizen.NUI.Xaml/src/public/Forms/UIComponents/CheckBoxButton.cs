@@ -17,7 +17,7 @@
 
 using System.ComponentModel;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
 
     /// <summary>

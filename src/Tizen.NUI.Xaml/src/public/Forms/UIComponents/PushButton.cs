@@ -20,7 +20,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using Tizen.NUI.XamlBinding;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
     /// <summary>
     /// The PushButton changes its appearance when it is pressed, and returns to its original when it is released.

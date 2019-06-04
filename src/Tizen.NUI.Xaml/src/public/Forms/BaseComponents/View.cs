@@ -139,7 +139,7 @@ namespace Tizen.NUI.Xaml.Forms.BaseComponents
         /// <since_tizen> 6 </since_tizen>
         /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly BindableProperty ContentProperty = BindableProperty.Create("Content", typeof(View), typeof(ContentPage), null, propertyChanged: (bindable, oldValue, newValue) =>
+        public static readonly BindableProperty ContentProperty = BindableProperty.Create("Content", typeof(View), typeof(View), null, propertyChanged: (bindable, oldValue, newValue) =>
         {
             var self = (View)bindable;
             if (newValue != null)

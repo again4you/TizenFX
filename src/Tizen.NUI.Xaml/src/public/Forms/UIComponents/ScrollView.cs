@@ -23,7 +23,7 @@ using Tizen.NUI.Xaml.Forms.BaseComponents;
 using static Tizen.NUI.ScrollView;
 using Tizen.NUI.UIComponents;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
     /// <summary>
     /// ScrollView contains views that can be scrolled manually (via touch).

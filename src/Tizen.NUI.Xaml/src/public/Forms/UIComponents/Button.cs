@@ -21,7 +21,7 @@ using Tizen.NUI;
 using Tizen.NUI.XamlBinding;
 using static Tizen.NUI.UIComponents.Button;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
     /// <summary>
     /// The Button class is a base class for different kinds of buttons.<br />

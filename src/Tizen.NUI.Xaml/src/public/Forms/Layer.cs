@@ -18,6 +18,7 @@ using System;
 using Tizen.NUI.Xaml.Forms.BaseComponents;
 using System.ComponentModel;
 using Tizen.NUI;
+using Tizen.NUI.XamlBinding;
 
 namespace Tizen.NUI.Xaml.Forms
 {
@@ -27,7 +28,8 @@ namespace Tizen.NUI.Xaml.Forms
     /// <since_tizen> 6 </since_tizen>
     /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class Layer : Container
+    [ContentProperty("Content")]
+    public class Layer : Container, Tizen.NUI.Binding.IResourcesProvider
     {
         private Tizen.NUI.Layer _layer;
         private Tizen.NUI.Layer layer
@@ -43,6 +45,93 @@ namespace Tizen.NUI.Xaml.Forms
             }
         }
 
+        /// <since_tizen> 6 </since_tizen>
+        /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool Tizen.NUI.Binding.IResourcesProvider.IsResourcesCreated => _resources != null;
+
+        ResourceDictionary _resources;
+
+        /// <since_tizen> 6 </since_tizen>
+        /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ResourceDictionary Resources
+        {
+            get
+            {
+                if (_resources != null)
+                    return _resources;
+                _resources = new ResourceDictionary();
+                ((IResourceDictionary)_resources).ValuesChanged += OnResourcesChanged;
+                return _resources;
+            }
+            set
+            {
+                if (_resources == value)
+                    return;
+                OnPropertyChanging();
+                if (_resources != null)
+                    ((IResourceDictionary)_resources).ValuesChanged -= OnResourcesChanged;
+                _resources = value;
+                OnResourcesChanged(value);
+                if (_resources != null)
+                    ((IResourceDictionary)_resources).ValuesChanged += OnResourcesChanged;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <since_tizen> 6 </since_tizen>
+        /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ResourceDictionary XamlResources
+        {
+            get
+            {
+                if (_resources != null)
+                    return _resources;
+
+                _resources = new ResourceDictionary();
+                ((IResourceDictionary)_resources).ValuesChanged += OnResourcesChanged;
+                return _resources;
+            }
+            set
+            {
+                if (_resources == value)
+                    return;
+                OnPropertyChanging();
+                if (_resources != null)
+                    ((IResourceDictionary)_resources).ValuesChanged -= OnResourcesChanged;
+                _resources = value;
+                OnResourcesChanged(value);
+                if (_resources != null)
+                    ((IResourceDictionary)_resources).ValuesChanged += OnResourcesChanged;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <since_tizen> 6 </since_tizen>
+        /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Tizen.NUI.Layer LayerInstance
+        {
+            get
+            {
+                return _layer;
+            }
+        }
+
+        /// <since_tizen> 6 </since_tizen>
+        /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly BindableProperty ContentProperty = BindableProperty.Create("Content", typeof(View), typeof(View), null, propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            var self = (Layer)bindable;
+            if (newValue != null)
+            {
+                self.Add((View)newValue);
+            }
+        });
+
         /// <summary>
         /// Creates a Xaml Layer object.
         /// </summary>
@@ -56,6 +145,18 @@ namespace Tizen.NUI.Xaml.Forms
         internal Layer(Tizen.NUI.Layer nuiInstance) : base(nuiInstance)
         {
             SetNUIInstance(nuiInstance);
+        }
+
+        /// <summary>
+        /// The contents of ContentPage can be added into it.
+        /// </summary>
+        /// <since_tizen> 6 </since_tizen>
+        /// This will be public opened in tizen_5.5 after ACR done. Before ACR, need to be hidden as inhouse API.
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public View Content
+        {
+            get { return (View)GetValue(ContentProperty); }
+            set { SetValue(ContentProperty, value); }
         }
 
         /// <summary>

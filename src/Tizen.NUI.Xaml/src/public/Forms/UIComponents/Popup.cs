@@ -22,7 +22,7 @@ using Tizen.NUI.BaseComponents;
 using Tizen.NUI.XamlBinding;
 using static Tizen.NUI.UIComponents.Popup;
 
-namespace Tizen.NUI.Xaml.UIComponents
+namespace Tizen.NUI.Xaml.Forms.UIComponents
 {
     /// <summary>
     /// The Popup widget provides a configurable popup dialog with a built-in layout of three main fields.
