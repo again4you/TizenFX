@@ -62,7 +62,6 @@ namespace Tizen.MachineLearning.Inference
         /// <param name="dimension">Dimension of Tensor. Note that we support up to 4th ranks.</param>
         /// <feature>http://tizen.org/feature/machine_learning.inference</feature>
         /// <exception cref="IndexOutOfRangeException">Thrown when the number of Tensor already exceeds the size limits (i.e. Tensor.SlzeLimit)</exception>
-        /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
         /// <exception cref="NotSupportedException">Thrown when the feature is not supported.</exception>
         /// <since_tizen> 6 </since_tizen>
         public void AddTensorInfo(TensorType type, int[] dimension)
@@ -78,7 +77,6 @@ namespace Tizen.MachineLearning.Inference
         /// <param name="dimension">Dimension of Tensor. Note that we support up to 4th ranks.</param>
         /// <feature>http://tizen.org/feature/machine_learning.inference</feature>
         /// <exception cref="IndexOutOfRangeException">Thrown when the number of Tensor already exceeds the size limits (i.e. Tensor.SlzeLimit)</exception>
-        /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
         /// <exception cref="NotSupportedException">Thrown when the feature is not supported.</exception>
         /// <since_tizen> 6 </since_tizen>
         public void AddTensorInfo(string name, TensorType type, int[] dimension)
@@ -149,7 +147,6 @@ namespace Tizen.MachineLearning.Inference
         /// <param name="type">The tensor type to be set.</param>
         /// <feature>http://tizen.org/feature/machine_learning.inference</feature>
         /// <exception cref="IndexOutOfRangeException">Thrown when the index is greater than the number of Tensor.</exception>
-        /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
         /// <exception cref="NotSupportedException">Thrown when the feature is not supported.</exception>
         /// <since_tizen> 6 </since_tizen>
         public void SetTensorType(int idx, TensorType type)
@@ -171,7 +168,6 @@ namespace Tizen.MachineLearning.Inference
         /// <param name="idx">The index of the tensor.</param>
         /// <returns>The tensor type</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when the index is greater than the number of Tensor.</exception>
-        /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
         /// <since_tizen> 6 </since_tizen>
         public TensorType GetTensorType(int idx)
         {
@@ -208,7 +204,6 @@ namespace Tizen.MachineLearning.Inference
         /// <param name="idx">The index of the tensor.</param>
         /// <returns>The tensor dimension.</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when the index is greater than the number of Tensor.</exception>
-        /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
         /// <since_tizen> 6 </since_tizen>
         public int[] GetDimension(int idx)
         {
@@ -221,7 +216,6 @@ namespace Tizen.MachineLearning.Inference
         /// </summary>
         /// <returns>TensorsData instance</returns>
         /// <feature>http://tizen.org/feature/machine_learning.inference</feature>
-        /// <exception cref="ArgumentException">Thrown when the method failed due to TensorsInfo's information is invalid.</exception>
         /// <exception cref="NotSupportedException">Thrown when the feature is not supported.</exception>
         /// <since_tizen> 6 </since_tizen>
         public TensorsData GetTensorsData()
