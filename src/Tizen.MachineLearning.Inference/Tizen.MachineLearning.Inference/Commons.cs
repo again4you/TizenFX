@@ -83,6 +83,15 @@ namespace Tizen.MachineLearning.Inference
         InvalidOperation = Tizen.Internals.Errors.ErrorCode.InvalidOperation,
     }
 
+    public enum PipelineState
+    {
+        Unknown = 0,
+        Null = 1,
+        Ready = 2,
+        Paused = 3,
+        Playing = 4,
+    }
+
     /// <summary>
     /// Types of Neural Network Framework.
     /// </summary>

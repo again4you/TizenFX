@@ -25,6 +25,33 @@ internal static partial class Interop
         public const string Nnstreamer = "libcapi-nnstreamer.so.0";
     }
 
+    internal static partial class Pipeline
+    {
+        /* typedef void (*ml_pipeline_state_cb) (ml_pipeline_state_e state, void *user_data); */
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void StateChangeCallback(PipelineState state, IntPtr user_data);
+
+        /* int ml_pipeline_construct (const char *pipeline_description, ml_pipeline_state_cb cb, void *user_data, ml_pipeline_h *pipe); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_construct", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Construct(string pipeline_description, StateChangeCallback callback, IntPtr user_data, out IntPtr pipeline_handle);
+
+        /* int ml_pipeline_destroy (ml_pipeline_h pipe); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_destroy", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Destroy(IntPtr pipeline_handle);
+
+        /* int ml_pipeline_get_state (ml_pipeline_h pipe, ml_pipeline_state_e *state) */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_get_state", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetState(IntPtr pipeline_handle, out PipelineState state);
+
+        /* int ml_pipeline_start (ml_pipeline_h pipe); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_start", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Start(IntPtr pipeline_handle);
+
+        /* int ml_pipeline_stop (ml_pipeline_h pipe); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_stop", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Stop(IntPtr pipeline_handle);
+    }
+
     internal static partial class SingleShot
     {
         /* int ml_single_open (ml_single_h *single, const char *model, const ml_tensors_info_h input_info, const ml_tensors_info_h output_info, ml_nnfw_type_e nnfw, ml_nnfw_hw_e hw) */
