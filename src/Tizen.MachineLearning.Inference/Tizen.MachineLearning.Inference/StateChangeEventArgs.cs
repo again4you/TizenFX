@@ -22,7 +22,7 @@ namespace Tizen.MachineLearning.Inference
     {
         internal StateChangeEventArgs(PipelineState state)
         {
-            state = state;
+            State = state;
         }
 
         public PipelineState State { get; }
