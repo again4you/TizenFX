@@ -24,7 +24,6 @@ namespace Tizen.MachineLearning.Inference
         {
             State = state;
         }
-
         public PipelineState State { get; }
     }
 }
