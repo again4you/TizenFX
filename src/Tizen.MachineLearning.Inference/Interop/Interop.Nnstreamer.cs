@@ -31,6 +31,10 @@ internal static partial class Interop
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate void StateChangeCallback(PipelineState state, IntPtr user_data);
 
+        /* typedef void (*ml_pipeline_sink_cb) (const ml_tensors_data_h data, const ml_tensors_info_h info, void *user_data); */
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void NewDataCallback(IntPtr data, IntPtr info, IntPtr user_data);
+
         /* int ml_pipeline_construct (const char *pipeline_description, ml_pipeline_state_cb cb, void *user_data, ml_pipeline_h *pipe); */
         [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_construct", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError Construct(string pipeline_description, StateChangeCallback callback, IntPtr user_data, out IntPtr pipeline_handle);
@@ -50,6 +54,14 @@ internal static partial class Interop
         /* int ml_pipeline_stop (ml_pipeline_h pipe); */
         [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_stop", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError Stop(IntPtr pipeline_handle);
+
+        /* int ml_pipeline_sink_register (ml_pipeline_h pipe, const char *sink_name, ml_pipeline_sink_cb cb, void *user_data, ml_pipeline_sink_h *sink_handle); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_sink_register", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError RegisterSinkCallback(IntPtr pipeline_handle, string sink_name, NewDataCallback callback, IntPtr user_data, out IntPtr sink_handle);
+
+        /* int ml_pipeline_sink_unregister (ml_pipeline_sink_h sink_handle); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_sink_unregister", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError UnregisterSinkCallback(IntPtr sink_handle);
     }
 
     internal static partial class SingleShot

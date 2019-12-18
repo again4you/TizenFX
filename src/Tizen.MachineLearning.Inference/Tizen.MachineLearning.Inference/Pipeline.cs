@@ -15,6 +15,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 
 namespace Tizen.MachineLearning.Inference
 {
@@ -22,6 +23,7 @@ namespace Tizen.MachineLearning.Inference
     {
         private IntPtr _handle = IntPtr.Zero;
         private bool _disposed = false;
+        private IDictionary<string, SinkCallbackEvent> _sinkEventList;
 
         private EventHandler<StateChangeEventArgs> _stateChanged;
         private Interop.Pipeline.StateChangeCallback _stateChangeCallback;
@@ -36,11 +38,14 @@ namespace Tizen.MachineLearning.Inference
             NNStreamerError ret = NNStreamerError.None;
             ret = Interop.Pipeline.Construct(description, null, IntPtr.Zero, out _handle);
             NNStreamer.CheckException(ret, "fail to create Pipeline instance");
+
+            _sinkEventList = new Dictionary<string, SinkCallbackEvent>();
         }
 
         public Pipeline(string description, EventHandler<StateChangeEventArgs> stateChanged)
         {
             NNStreamer.CheckNNStreamerSupport();
+
             if (description == null)
                 throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Parameter is null");
 
@@ -55,6 +60,8 @@ namespace Tizen.MachineLearning.Inference
 
             /* Need to check */
             _stateChanged += stateChanged;
+
+            _sinkEventList = new Dictionary<string, SinkCallbackEvent>();
         }
 
         ~Pipeline()
@@ -123,6 +130,111 @@ namespace Tizen.MachineLearning.Inference
                 _handle = IntPtr.Zero;
             }
             _disposed = true;
+        }
+
+        public void RegisterSinkCallback(string sinkNodeName, EventHandler<NewDataEventArgs> newDataCreated)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            /* Check the argument */
+            if (string.IsNullOrEmpty(sinkNodeName))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Node Name is invalid");
+
+            if (newDataCreated == null)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Event Handler is invalid");
+
+            SinkCallbackEvent sce;
+            if (_sinkEventList.ContainsKey(sinkNodeName) == true)
+            {
+                sce = _sinkEventList[sinkNodeName];
+            }
+            else
+            {
+                sce = new SinkCallbackEvent(sinkNodeName, _handle);
+            }
+            sce.NewDataCreated += newDataCreated;
+        }
+
+        public void UnregisterSinkCallback(string sinkNodeName, EventHandler<NewDataEventArgs> newDataCreated)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            /* Check the argument */
+            if (string.IsNullOrEmpty(sinkNodeName) || (_sinkEventList.ContainsKey(sinkNodeName) != true))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Node Name is invalid");
+
+            if (newDataCreated == null)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Event Handler is invalid");
+
+            /* todo: Exception occurs */
+            /*
+            if (_sinkEventList.ContainsKey(sinkNodeName) != true)
+                return;
+            */
+
+            SinkCallbackEvent sce = _sinkEventList[sinkNodeName];
+            sce.NewDataCreated -= newDataCreated;
+        }
+
+        private class SinkCallbackEvent
+        {
+            private EventHandler<NewDataEventArgs> _newDataCreated;
+            private Interop.Pipeline.NewDataCallback _newDataCreatedCallback;
+            private IntPtr _pipelineHandle = IntPtr.Zero;
+            private IntPtr _callbackHandle = IntPtr.Zero;
+
+            private readonly object _eventLock = new object();
+
+            public SinkCallbackEvent(string sinkNodeName, IntPtr pipelineHandle)
+            {
+                Name = sinkNodeName;
+                _pipelineHandle = pipelineHandle;
+
+                _newDataCreatedCallback = (data_handle, Info_handle, _) =>
+                {
+                    TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, Info_handle, true);
+                    _newDataCreated?.Invoke(this, new NewDataEventArgs(data));
+                };
+            }
+
+            public event EventHandler<NewDataEventArgs> NewDataCreated
+            {
+                add
+                {
+                    if (value == null)
+                        return;
+
+                    lock (_eventLock)
+                    {
+                        if (_newDataCreated == null)
+                        {
+                            NNStreamerError ret = NNStreamerError.None;
+                            ret = Interop.Pipeline.RegisterSinkCallback(_pipelineHandle, Name, _newDataCreatedCallback, IntPtr.Zero, out _callbackHandle);
+                            NNStreamer.CheckException(ret, "fail to register NewDataCreate Event Handler");
+                        }
+                        _newDataCreated += value;
+                    }
+                }
+                remove
+                {
+                    if (value == null)
+                        return;
+
+                    lock (_eventLock)
+                    {
+                        if (_newDataCreated == value)
+                        {
+                            NNStreamerError ret = NNStreamerError.None;
+                            ret = Interop.Pipeline.UnregisterSinkCallback(_callbackHandle);
+                            NNStreamer.CheckException(ret, "fail to unregister NewDataCreate Event Handler");
+
+                        }
+                        _newDataCreated -= value;
+                    }
+                }
+            }
+
+            public string Name { get; }
         }
     }
 }
