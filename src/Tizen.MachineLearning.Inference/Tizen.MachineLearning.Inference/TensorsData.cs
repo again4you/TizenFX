@@ -221,14 +221,26 @@ namespace Tizen.MachineLearning.Inference
         internal void PrepareInvoke()
         {
             NNStreamerError ret = NNStreamerError.None;
-            int count = _dataList.Count;
 
+            Log.Error(NNStreamer.TAG, "TensorsData - PrepareInvoke - 1");
+
+            /* Already prepared */
+            if (_handle != IntPtr.Zero)
+                return;
+
+            Log.Error(NNStreamer.TAG, "TensorsData - PrepareInvoke - 2");
+
+            int count = _dataList.Count;
             for (int i = 0; i < count; ++i)
             {
                 byte[] data = (byte[])_dataList[i];
                 ret = Interop.Util.SetTensorData(_handle, i, data, data.Length);
                 NNStreamer.CheckException(ret, "unable to set the buffer of TensorsData: " + i.ToString());
+
+                Log.Error(NNStreamer.TAG, "TensorsData - PrepareInvoke - 3");
             }
+
+            Log.Error(NNStreamer.TAG, "TensorsData - PrepareInvoke - 4");
         }
 
         internal static TensorsData CreateFromNativeHandle(IntPtr dataHandle, IntPtr infoHandle, bool isFetch)

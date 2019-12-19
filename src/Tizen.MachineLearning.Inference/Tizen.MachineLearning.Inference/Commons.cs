@@ -148,6 +148,12 @@ namespace Tizen.MachineLearning.Inference
         NPU = 0x3000,
     }
 
+    internal enum PipelineBufferPolicy
+    {
+        AutoFree = 0,
+        NotFreed = 1,
+    }
+
     internal static class Tensor
     {
         /// <summary>

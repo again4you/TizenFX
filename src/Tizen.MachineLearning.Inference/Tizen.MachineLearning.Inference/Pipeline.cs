@@ -24,6 +24,7 @@ namespace Tizen.MachineLearning.Inference
         private IntPtr _handle = IntPtr.Zero;
         private bool _disposed = false;
         private IDictionary<string, SinkCallbackEvent> _sinkEventList;
+        private IDictionary<string, NodeHandleInfo> _nodeHandleList;
 
         private EventHandler<StateChangeEventArgs> _stateChanged;
         private Interop.Pipeline.StateChangeCallback _stateChangeCallback;
@@ -40,6 +41,7 @@ namespace Tizen.MachineLearning.Inference
             NNStreamer.CheckException(ret, "fail to create Pipeline instance");
 
             _sinkEventList = new Dictionary<string, SinkCallbackEvent>();
+            _nodeHandleList = new Dictionary<string, NodeHandleInfo>();
         }
 
         public Pipeline(string description, EventHandler<StateChangeEventArgs> stateChanged)
@@ -62,10 +64,12 @@ namespace Tizen.MachineLearning.Inference
             _stateChanged += stateChanged;
 
             _sinkEventList = new Dictionary<string, SinkCallbackEvent>();
+            _nodeHandleList = new Dictionary<string, NodeHandleInfo>();
         }
 
         ~Pipeline()
         {
+
             Dispose(false);
         }
 
@@ -110,6 +114,8 @@ namespace Tizen.MachineLearning.Inference
 
         protected virtual void Dispose(bool disposing)
         {
+            Log.Error(NNStreamer.TAG, "Pipeline - Dispose - 1");
+
             if (_disposed)
                 return;
 
@@ -118,9 +124,24 @@ namespace Tizen.MachineLearning.Inference
                 // release managed object
             }
 
+            /* Close all opened handle and remove all*/
+            foreach (NodeHandleInfo hInfo in _nodeHandleList.Values)
+            {
+                switch (hInfo.Type)
+                {
+                    case HandleType.Source:
+                        Log.Error(NNStreamer.TAG, "Pipeline - Dispose - 2: " + hInfo.Handle.ToString());
+                        Interop.Pipeline.ReleaseSrcHandle(hInfo.Handle);
+                        break;
+                }
+            }
+            _nodeHandleList.Clear();
+            Log.Error(NNStreamer.TAG, "Pipeline - Dispose - 3");
+
             // release unmanaged objects
             if (_handle != IntPtr.Zero)
             {
+                Log.Error(NNStreamer.TAG, "Pipeline - Dispose - 4");
                 NNStreamerError ret = NNStreamerError.None;
                 ret = Interop.Pipeline.Destroy(_handle);
                 if (ret != NNStreamerError.None)
@@ -128,7 +149,10 @@ namespace Tizen.MachineLearning.Inference
                     Log.Error(NNStreamer.TAG, "failed to close Pipeline instance");
                 }
                 _handle = IntPtr.Zero;
+
+                Log.Error(NNStreamer.TAG, "Pipeline - Dispose - 5");
             }
+
             _disposed = true;
         }
 
@@ -151,6 +175,7 @@ namespace Tizen.MachineLearning.Inference
             else
             {
                 sce = new SinkCallbackEvent(sinkNodeName, _handle);
+                _sinkEventList.Add(sinkNodeName, sce);
             }
             sce.NewDataCreated += newDataCreated;
         }
@@ -175,6 +200,83 @@ namespace Tizen.MachineLearning.Inference
             SinkCallbackEvent sce = _sinkEventList[sinkNodeName];
             sce.NewDataCreated -= newDataCreated;
         }
+
+        public void InputData(string srcNodeName, TensorsData data)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(srcNodeName))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Node Name is invalid");
+
+            if (data == null)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "TensorsData is invalid");
+
+            Log.Error(NNStreamer.TAG, "Pipeline - InputData - 1");
+
+            NNStreamerError ret = NNStreamerError.None;
+
+            Log.Error(NNStreamer.TAG, "Pipeline - InputData - 2");
+
+            /* Get src node handle */
+            NodeHandleInfo hInfo;
+            if (_nodeHandleList.ContainsKey(srcNodeName))
+            {
+                Log.Error(NNStreamer.TAG, "Pipeline - InputData - 3");
+
+                hInfo = _nodeHandleList[srcNodeName];
+
+                Log.Error(NNStreamer.TAG, "Pipeline - InputData - 4");
+            }
+            else
+            {
+                Log.Error(NNStreamer.TAG, "Pipeline - InputData - 5");
+
+                IntPtr srcHandle = IntPtr.Zero;
+                ret = Interop.Pipeline.GetSrcHandle(_handle, srcNodeName, out srcHandle);
+                NNStreamer.CheckException(ret, "Failed to get Source Node handle");
+
+                Log.Error(NNStreamer.TAG, "Pipeline - InputData - 6: " + srcHandle.ToString());
+
+                hInfo = new NodeHandleInfo(srcHandle, HandleType.Source);
+                _nodeHandleList.Add(srcNodeName, hInfo);
+
+                Log.Error(NNStreamer.TAG, "Pipeline - InputData - 7");
+            }
+
+            /* Prepare TensorsData */
+            data.PrepareInvoke();
+
+            Log.Error(NNStreamer.TAG, "Pipeline - InputData - 8: " + hInfo.Handle);
+
+            /* Input data */
+            ret = Interop.Pipeline.InputSrcData(hInfo.Handle, data.GetHandle(), PipelineBufferPolicy.NotFreed);
+            NNStreamer.CheckException(ret, "Failed to input tensors data to source node: " + srcNodeName);
+
+            Log.Error(NNStreamer.TAG, "Pipeline - InputData - 9");
+        }
+
+        private class NodeHandleInfo
+        {
+            public IntPtr Handle { get; }
+            public HandleType Type { get; }
+
+            public NodeHandleInfo(IntPtr handle, HandleType type)
+            {
+                Handle = handle;
+                Type = type;
+            }
+        }
+
+        private enum HandleType
+        {
+            Source = 0,
+            Sink = 1,
+            Valve = 2,
+            SwitchIn = 3,
+            SwitchOut = 4,
+
+            Unknown,
+        };
 
         private class SinkCallbackEvent
         {
@@ -227,7 +329,6 @@ namespace Tizen.MachineLearning.Inference
                             NNStreamerError ret = NNStreamerError.None;
                             ret = Interop.Pipeline.UnregisterSinkCallback(_callbackHandle);
                             NNStreamer.CheckException(ret, "fail to unregister NewDataCreate Event Handler");
-
                         }
                         _newDataCreated -= value;
                     }

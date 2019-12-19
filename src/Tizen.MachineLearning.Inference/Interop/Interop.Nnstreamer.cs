@@ -62,6 +62,18 @@ internal static partial class Interop
         /* int ml_pipeline_sink_unregister (ml_pipeline_sink_h sink_handle); */
         [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_sink_unregister", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError UnregisterSinkCallback(IntPtr sink_handle);
+
+        /* int ml_pipeline_src_get_handle (ml_pipeline_h pipe, const char *src_name, ml_pipeline_src_h *src_handle); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_src_get_handle", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetSrcHandle(IntPtr pipeline_handle, string src_name, out IntPtr src_handle);
+
+        /* int ml_pipeline_src_release_handle (ml_pipeline_src_h src_handle); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_src_release_handle", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError ReleaseSrcHandle(IntPtr src_handle);
+
+        /* int ml_pipeline_src_input_data (ml_pipeline_src_h src_handle, ml_tensors_data_h data, ml_pipeline_buf_policy_e policy); */
+        [DllImport(Libraries.Nnstreamer, EntryPoint = "ml_pipeline_src_input_data", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError InputSrcData(IntPtr src_handle, IntPtr data_handle, PipelineBufferPolicy policy);
     }
 
     internal static partial class SingleShot
