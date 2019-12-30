@@ -29,6 +29,7 @@ namespace Tizen.MachineLearning.Inference
         private bool _disposed = false;
         private TensorsInfo _tensorsInfo = null;
         private ArrayList _dataList = null;
+        private bool isPrepared = false;
 
         /// <summary>
         /// Creates a TensorsData instance with handle which is given by TensorsInfo.
@@ -36,8 +37,9 @@ namespace Tizen.MachineLearning.Inference
         /// <param name="handle">The handle of tensors data.</param>
         /// <param name="info">The handle of tensors info. (Default: null)</param>
         /// <param name="isFetch">The boolean value for fetching the data (Default: false)</param>
+        /// <param name="notDisposal">The boolean value for not automatical disposal (Default: false)</param>
         /// <since_tizen> 6 </since_tizen>
-        private TensorsData(IntPtr handle, TensorsInfo info, bool isFetch)
+        private TensorsData(IntPtr handle, TensorsInfo info, bool isFetch, bool notDisposal = false)
         {
             NNStreamer.CheckNNStreamerSupport();
             NNStreamerError ret = NNStreamerError.None;
@@ -78,6 +80,9 @@ namespace Tizen.MachineLearning.Inference
                     _dataList.Add(bufData);
                 }
             }
+
+            /* If it created as NewDataEventArgs, do not dispose*/
+            _disposed = notDisposal;
         }
 
         /// <summary>
@@ -221,28 +226,33 @@ namespace Tizen.MachineLearning.Inference
         internal void PrepareInvoke()
         {
             NNStreamerError ret = NNStreamerError.None;
-            int count = _dataList.Count;
 
+            /* Already prepared */
+            if (isPrepared)
+                return;
+
+            int count = _dataList.Count;
             for (int i = 0; i < count; ++i)
             {
                 byte[] data = (byte[])_dataList[i];
                 ret = Interop.Util.SetTensorData(_handle, i, data, data.Length);
                 NNStreamer.CheckException(ret, "unable to set the buffer of TensorsData: " + i.ToString());
             }
+            isPrepared = true;
         }
 
-        internal static TensorsData CreateFromNativeHandle(IntPtr dataHandle, IntPtr infoHandle, bool isFetch)
+        internal static TensorsData CreateFromNativeHandle(IntPtr dataHandle, IntPtr infoHandle, bool isFetch, bool notDispose)
         {
             TensorsData retTensorsData = null;
 
             if (infoHandle == IntPtr.Zero)
             {
-                retTensorsData = new TensorsData(dataHandle, null, isFetch);
+                retTensorsData = new TensorsData(dataHandle, null, isFetch, notDispose);
             }
             else
             {
                 TensorsInfo info = TensorsInfo.ConvertTensorsInfoFromHandle(infoHandle);
-                retTensorsData = new TensorsData(dataHandle, info, isFetch);
+                retTensorsData = new TensorsData(dataHandle, info, isFetch, notDispose);
             }
 
             return retTensorsData;

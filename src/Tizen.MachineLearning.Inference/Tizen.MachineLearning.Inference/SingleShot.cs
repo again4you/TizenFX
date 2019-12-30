@@ -235,7 +235,7 @@ namespace Tizen.MachineLearning.Inference
                 ret = Interop.SingleShot.InvokeSingleDynamic(_handle, inTensorsData.GetHandle(), inInfo.GetTensorsInfoHandle(), out outDataPtr, out outInfoPtr);
                 NNStreamer.CheckException(ret, "fail to invoke the single dynamic inference");
 
-                out_data = TensorsData.CreateFromNativeHandle(outDataPtr, outInfoPtr, true);
+                out_data = TensorsData.CreateFromNativeHandle(outDataPtr, outInfoPtr, true, false);
             }
             else
             {
@@ -253,7 +253,7 @@ namespace Tizen.MachineLearning.Inference
                 ret = Interop.SingleShot.InvokeSingle(_handle, inTensorsData.GetHandle(), out outDataPtr);
                 NNStreamer.CheckException(ret, "fail to invoke the single inference");
 
-                out_data = TensorsData.CreateFromNativeHandle(outDataPtr, data_inInfo.GetTensorsInfoHandle(), true);
+                out_data = TensorsData.CreateFromNativeHandle(outDataPtr, data_inInfo.GetTensorsInfoHandle(), true, false);
             }
             return out_data;
         }

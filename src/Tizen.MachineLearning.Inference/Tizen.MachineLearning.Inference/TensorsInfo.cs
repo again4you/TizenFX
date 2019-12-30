@@ -261,7 +261,7 @@ namespace Tizen.MachineLearning.Inference
             ret = Interop.Util.CreateTensorsData(_handle, out tensorsData_h);
             NNStreamer.CheckException(ret, "unable to create the tensorsData object");
 
-            retTensorData = TensorsData.CreateFromNativeHandle(tensorsData_h, _handle, false);
+            retTensorData = TensorsData.CreateFromNativeHandle(tensorsData_h, _handle, false, false);
 
             return retTensorData;
         }

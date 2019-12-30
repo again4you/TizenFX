@@ -83,6 +83,40 @@ namespace Tizen.MachineLearning.Inference
         InvalidOperation = Tizen.Internals.Errors.ErrorCode.InvalidOperation,
     }
 
+    internal enum SwitchType
+    {
+        OutputSelector = 0,
+        InputSelector = 1,
+    }
+
+    /// <summary>
+    /// States of NNStreamer pipeline
+    /// </summary>
+    /// <since_tizen> 8 </since_tizen>
+    public enum PipelineState
+    {
+        /// <summary>
+        /// Unknown state
+        /// </summary>
+        Unknown = 0,
+        /// <summary>
+        /// Initial state of the pipeline
+        /// </summary>
+        Null = 1,
+        /// <summary>
+        /// The pipeline is ready to go to PAUSED
+        /// </summary>
+        Ready = 2,
+        /// <summary>
+        /// The pipeline is stopped, ready to accept and process data
+        /// </summary>
+        Paused = 3,
+        /// <summary>
+        /// The pipeline is started and the data is flowing.
+        /// </summary>
+        Playing = 4,
+    }
+
     /// <summary>
     /// Types of Neural Network Framework.
     /// </summary>
@@ -137,6 +171,12 @@ namespace Tizen.MachineLearning.Inference
         /// Any NPU if possible.
         /// </summary>
         NPU = 0x3000,
+    }
+
+    internal enum PipelineBufferPolicy
+    {
+        AutoFree = 0,
+        NotFreed = 1,
     }
 
     internal static class Tensor
@@ -236,7 +276,7 @@ namespace Tizen.MachineLearning.Inference
 
                 case NNStreamerError.StreamsPipe:
                 case NNStreamerError.TryAgain:
-                    exp = new IOException(msg);
+                    exp = new SystemException(msg);
                     break;
 
                 case NNStreamerError.TimedOut:
